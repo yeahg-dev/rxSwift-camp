@@ -176,16 +176,12 @@ observable.subscribe(onNext: { (element) in
 
 ## 4. Observable : hot 🆚 cold
 
----
-
 - cold : observer가 subscribe하기 전 까진 아이템을 방출하지 않는 observable
 - hot : subscribe에 상관없이 언제나 아이템을 방출하고 있는 observable. observer가 구독을 하면 방출이 처음 시작된 이후에 방출되는 아이템(구독하는 시점부터 방출되는 아이템)을 관찰. 그래서 observer는 방출이 시작한 뒤부터 구독 전까지 방출한 아이템은 놓침
 
 <br>
 
 ## 5. Backpressure
-
----
 
 backpressure는 선택 (모든 observable과 operator가 지원하는 것은 아님)
 
@@ -199,7 +195,6 @@ observable이 배압을 구현하지 않았는데, `request` 를 받으면 배�
 
 ## 6. Unsubscribe
 
----
 
 `Subscriber` 라는 특별한 observer 인터페이스가 존재하는데, `unsubscribe` 메서드를 구현한다. `unsubscribe` 을 호출하면, 구독당하고 있던 observable은 다른 observer가 없다면 새로운 아이템을 방출하는 것을 멈춘다. 
 
@@ -211,6 +206,8 @@ observable이 배압을 구현하지 않았는데, `request` 를 받으면 배�
 - Observable이 `next` 이벤트를 방출하면, 계속해서 이벤트를 진행할 수 있음
 - `error` 이벤트를 방출하여 완전 종료될 수 있음
 - `complete` 이벤트를 방출하여 완전 종료될 수 있음
+
+<br>
 
 ## 7. Dispose
 
