@@ -15,7 +15,8 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        bindUI()
+        bindInput()
+        bindOutput()
     }
 
     // MARK: - IBOutler
@@ -26,37 +27,53 @@ class ViewController: UIViewController {
     @IBOutlet var idValidView: UIView!
     @IBOutlet var pwValidView: UIView!
 
+    let idInputText: BehaviorSubject<String> = BehaviorSubject(value: "")
+    let idValid: BehaviorSubject<Bool> = BehaviorSubject(value: false)
+    let pwInputText: BehaviorSubject<String> = BehaviorSubject(value: "")
+    let pwValid: BehaviorSubject<Bool> = BehaviorSubject(value: false)
+    
     // MARK: - Bind UI
+    // id input +--> check valid --> bullet
+    //          |
+    //          +--> button enable
+    //          |
+    // pw input +--> check valid --> bullet
 
-    private func bindUI() {
-        // id input +--> check valid --> bullet
-        //          |
-        //          +--> button enable
-        //          |
-        // pw input +--> check valid --> bullet
-        
+    private func bindInput() {
+       
         idField.rx.text.orEmpty
-            .map(checkEmailValid)
-            .subscribe(onNext: {result in
-                self.idValidView.isHidden = result
-            })
+            .bind(to: idInputText)
+            .disposed(by: disposeBag)
+        
+        idInputText.map(checkEmailValid)
+            .bind(to: idValid)
             .disposed(by: disposeBag)
         
         pwField.rx.text.orEmpty
-            .map(checkPasswordValid)
-            .subscribe(onNext: {result in
-                self.pwValidView.isHidden = result
-            })
+            .bind(to: pwInputText)
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(
-            idField.rx.text.orEmpty.map(checkEmailValid),
-            pwField.rx.text.orEmpty.map(checkPasswordValid),
-            resultSelector: {s1, s2 in s1 && s2})
-        .subscribe(onNext: {result in
-            self.loginButton.isEnabled = result
-        })
+        pwInputText.map(checkPasswordValid)
+            .bind(to: pwValid)
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindOutput() {
+        idValid.subscribe { [weak self] result in
+            self?.idValidView.isHidden = result
+        }.disposed(by: disposeBag)
+        
+        pwValid.subscribe { [weak self] result in
+            self?.pwValidView.isHidden = result
+        }.disposed(by: disposeBag)
+        
+        Observable.combineLatest(idValid,
+                                 pwValid,
+                                 resultSelector: {$0 && $1})
+        .subscribe (onNext: { [weak self] result in
+            self?.loginButton.isEnabled = result})
         .disposed(by: disposeBag)
+        
     }
 
     // MARK: - Logic
